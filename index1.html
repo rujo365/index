@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rajesh Digital 24 | All-in-One Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --blue: #1e3a8a; --red: #ef4444; --bg: #f1f5f9; --white: #ffffff; }
+        body { margin: 0; font-family: 'Hind Siliguri', sans-serif; background: var(--bg); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        
+        .headline { background: var(--red); color: white; padding: 10px 0; font-weight: bold; font-size: 16px; border-bottom: 2px solid #fff; }
+
+        #auth-screen { position: fixed; inset: 0; background: #0f172a; display: flex; justify-content: center; align-items: center; z-index: 10000; }
+        .auth-card { background: white; padding: 35px; border-radius: 20px; width: 360px; text-align: center; border-top: 10px solid var(--red); box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+        .inp { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 15px; outline: none; }
+        .btn-auth { width: 100%; padding: 12px; background: var(--blue); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; }
+
+        header { background: var(--white); padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--blue); }
+        .main-wrapper { display: flex; flex: 1; overflow: hidden; }
+        
+        .sidebar { width: 260px; background: var(--white); border-right: 1px solid #ddd; padding: 20px; flex-shrink: 0; overflow-y: auto; }
+        .nav-item { padding: 14px; margin-bottom: 10px; border-radius: 12px; cursor: pointer; font-weight: bold; background: #f8fafc; transition: 0.3s; color: #444; display: flex; align-items: center; gap: 10px; }
+        .nav-item:hover, .nav-item.active { background: var(--blue); color: white; }
+
+        .content { flex: 1; padding: 25px; overflow-y: auto; }
+        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 25px; }
+        
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
+        .link-card { background: #fff; padding: 12px; border: 1px solid #ddd; border-radius: 10px; text-decoration: none; color: var(--blue); font-weight: 600; font-size: 14px; text-align: center; transition: 0.3s; display: flex; align-items: center; justify-content: center; min-height: 50px; }
+        .link-card:hover { background: var(--blue); color: white; transform: translateY(-3px); }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
+        th, td { border: 1px solid #eee; padding: 12px; text-align: left; }
+        th { background: var(--blue); color: white; }
+
+        .hidden { display: none; }
+        @media print { .sidebar, header, .headline, .btn-auth, .nav-item, .no-print { display: none !important; } .content { padding: 0; } body { background: white; } }
+    </style>
+</head>
+<body>
+
+    <div class="headline">
+        <marquee direction="left" scrollamount="6">🔥 রাজেশ ডিজিটাল ২৪ - তাহেরপুর | সব ধরণের সরকারি ও লোন সার্ভিসের নির্ভরযোগ্য প্রতিষ্ঠান | হেল্পলাইন: 9332 749 691 🔥</marquee>
+    </div>
+
+    <div id="auth-screen">
+        <div class="auth-card">
+            <h2 style="color:var(--blue)">লগইন প্যানেল</h2>
+            <input type="text" id="uid" class="inp" placeholder="ইউজার আইডি (admin)">
+            <input type="password" id="ups" class="inp" placeholder="পাসওয়ার্ড (admin)">
+            <button class="btn-auth" onclick="login()">প্রবেশ করুন</button>
+            <p style="margin-top:20px; font-weight:bold; color:var(--red)">📞 9332 749 691</p>
+        </div>
+    </div>
+
+    <header>
+        <b style="font-size:22px; color:var(--blue)">RAJESH DIGITAL 24</b>
+        <div id="clock" style="font-weight:bold; color: #555;"></div>
+    </header>
+
+    <div class="main-wrapper">
+        <nav class="sidebar">
+            <div class="nav-item active" onclick="showPage('home', this)">🏠 হোমপেজ (ডকুমেন্টস)</div>
+            <div class="nav-item" onclick="showPage('links', this)">🌐 সব সার্ভিস লিঙ্ক</div>
+            <div class="nav-item" onclick="showPage('loan', this)">📝 লোন আবেদন ফর্ম</div>
+            <div class="nav-item" onclick="showPage('recovery', this)">💰 কাস্টমার রিকভারি</div>
+            <div style="margin-top:40px;" class="nav-item" onclick="logout()">🔒 লগআউট</div>
+        </nav>
+
+        <main class="content">
+            <div id="home-page" class="page">
+                <div class="card">
+                    <h3>📋 কাজের তালিকা ও প্রয়োজনীয় ডকুমেন্টস</h3>
+                    <div class="grid-3" id="doc-grid"></div>
+                </div>
+            </div>
+
+            <div id="links-page" class="page hidden">
+                <div class="card">
+                    <h3 style="color:var(--blue); border-bottom: 2px solid #ddd; padding-bottom: 10px;">🌐 ডিজিটাল সার্ভিস পোর্টাল (সরকারি ও বেসরকারি)</h3>
+                    <div class="grid-3" id="service-grid">
+                        </div>
+                </div>
+            </div>
+
+            <div id="loan-page" class="page hidden">
+                <div class="card">
+                    <h2 style="text-align:center; color:var(--blue);">লোন আবেদনপত্র</h2>
+                    <div class="grid-3">
+                        <div style="display:grid;"><label>কাস্টমারের নাম</label><input type="text" class="inp"></div>
+                        <div style="display:grid;"><label>পিতার নাম</label><input type="text" class="inp"></div>
+                        <div style="display:grid;"><label>বউয়ের নাম</label><input type="text" class="inp"></div>
+                        <div style="display:grid;"><label>মোবাইল নম্বর</label><input type="tel" class="inp"></div>
+                        <div style="display:grid;"><label>ধর্ম</label><select class="inp"><option>হিন্দু</option><option>মুসলমান</option><option>খ্রিস্টান</option></select></div>
+                        <div style="display:grid;"><label>বৈবাহিক অবস্থা</label><select class="inp"><option>বিবাহিত</option><option>অবিবাহিত</option></select></div>
+                        <div style="display:grid;"><label>লোনের পরিমাণ</label><input type="number" class="inp"></div>
+                        <div style="display:grid;"><label>কিস্তির ধরণ</label><select class="inp"><option>সাপ্তাহিক</option><option>মাসিক</option><option>দৈনিক</option></select></div>
+                        <div style="display:grid;"><label>ইন্টারেস্ট (%)</label><input type="text" class="inp"></div>
+                    </div>
+                    <button class="btn-auth no-print" onclick="window.print()" style="margin-top:20px; background:#10b981; width:200px;">🖨️ প্রিন্ট করুন</button>
+                </div>
+            </div>
+
+            <div id="recovery-page" class="page hidden">
+                <div class="card no-print">
+                    <h3>💰 লোন রিকভারি এন্ট্রি</h3>
+                    <div class="grid-3">
+                        <input type="text" id="rec-name" class="inp" placeholder="কাস্টমারের নাম">
+                        <input type="number" id="rec-amt" class="inp" placeholder="টাকা">
+                        <button class="btn-auth" onclick="addRecovery()">জমা নিন</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <table>
+                        <thead>
+                            <tr><th>নাম</th><th>পেমেন্ট সংখ্যা</th><th>হিস্ট্রি</th><th>মোট জমা</th></tr>
+                        </thead>
+                        <tbody id="recovery-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let recoveryData = JSON.parse(localStorage.getItem('raj_rec')) || {};
+
+        function login() {
+            if(document.getElementById('uid').value==='admin' && document.getElementById('ups').value==='admin') {
+                localStorage.setItem('logged', 'true');
+                document.getElementById('auth-screen').style.display = 'none';
+            } else { alert("ভুল আইডি বা পাসওয়ার্ড!"); }
+        }
+
+        window.onload = () => {
+            if(localStorage.getItem('logged') === 'true') document.getElementById('auth-screen').style.display = 'none';
+            setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleString('bn-BD'); }, 1000);
+            loadHomeDocs();
+            loadServices();
+            renderRecTable();
+        };
+
+        function logout() { localStorage.removeItem('logged'); location.reload(); }
+
+        function showPage(id, el) {
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+            document.getElementById(id+'-page').classList.remove('hidden');
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        function loadHomeDocs() {
+            const list = ["নতুন আধার", "আধার সংশোধন", "নতুন প্যান", "ভোটার কার্ড", "রেশন কার্ড", "ব্যাঙ্ক অ্যাকাউন্ট", "লোন ফাইল", "ইনকাম সার্টিফিকেট", "কাস্ট সার্টিফিকেট", "জীবন প্রমাণ"];
+            const grid = document.getElementById('doc-grid');
+            list.forEach(d => {
+                grid.innerHTML += `<div style="background:#fff; padding:15px; border-radius:10px; border-left:5px solid red; border:1px solid #ddd;"><b>${d}</b><br><small>আধার, ভোটার, ফটো ও মোবাইল নম্বর লাগবে।</small></div>`;
+            });
+        }
+
+        function loadServices() {
+            const services = [
+                {n: "UIDAI (আধার)", l: "https://myaadhaar.uidai.gov.in/"},
+                {n: "Voter Portal", l: "https://voters.eci.gov.in/"},
+                {n: "Digital Ration Card", l: "https://food.wb.gov.in/"},
+                {n: "Income Tax (PAN)", l: "https://www.incometax.gov.in/"},
+                {n: "PM Kisan", l: "https://pmkisan.gov.in/"},
+                {n: "Banglar Bhumi", l: "https://banglarbhumi.gov.in/"},
+                {n: "Swasthya Sathi", l: "https://swasthyasathi.gov.in/"},
+                {n: "Caste Certificate", l: "https://castcertificatewb.gov.in/"},
+                {n: "Lakshmir Bhandar", l: "https://socialsecurity.wb.gov.in/"},
+                {n: "PF Portal", l: "https://www.epfindia.gov.in/"},
+                {n: "WBPDS (Ration)", l: "https://wbpds.wb.gov.in/"},
+                {n: "Passport Seva", l: "https://www.passportindia.gov.in/"},
+                {n: "Employment Bank", l: "https://employmentbankwb.gov.in/"},
+                {n: "CSC Login", l: "https://digitalseva.csc.gov.in/"},
+                {n: "Fino Payment Bank", l: "https://partner.finobank.com/"},
+                {n: "Spice Money", l: "https://b2b.spicemoney.com/"},
+                {n: "Airtel Bank", l: "https://portal.airtelbank.com/"}
+            ];
+            const grid = document.getElementById('service-grid');
+            // Adding 70 dummy entries for illustration, you can replace with real ones
+            for(let i=1; i<=70; i++) {
+                let s = services[i-1] || {n: "সার্ভিস লিঙ্ক " + i, l: "#"};
+                grid.innerHTML += `<a href="${s.l}" target="_blank" class="link-card">${s.n}</a>`;
+            }
+        }
+
+        function addRecovery() {
+            const name = document.getElementById('rec-name').value.trim();
+            const amt = parseFloat(document.getElementById('rec-amt').value);
+            const dt = new Date().toLocaleDateString('bn-BD');
+            if(!name || !amt) return;
+            if(!recoveryData[name]) {
+                recoveryData[name] = { count: 1, total: amt, history: [`${amt}টাকা (${dt})`] };
+            } else {
+                recoveryData[name].count++;
+                recoveryData[name].total += amt;
+                recoveryData[name].history.push(`${amt}টাকা (${dt})`);
+            }
+            localStorage.setItem('raj_rec', JSON.stringify(recoveryData));
+            renderRecTable();
+            document.getElementById('rec-amt').value = '';
+        }
+
+        function renderRecTable() {
+            const b = document.getElementById('recovery-body');
+            b.innerHTML = '';
+            for(let k in recoveryData) {
+                const d = recoveryData[k];
+                b.innerHTML += `<tr><td><b>${k}</b></td><td>${d.count} বার</td><td style="font-size:12px;">${d.history.join('<br>')}</td><td style="color:green; font-weight:bold;">${d.total} টাকা</td></tr>`;
+            }
+        }
+    </script>
+</body>
+</html>
