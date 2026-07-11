@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digital 24 - Login</title>
+    <title>Digital 24 - Advanced Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -11,7 +12,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
         }
         .login-container {
@@ -42,7 +43,7 @@
             border-radius: 4px;
             box-sizing: border-box;
         }
-        button {
+        .btn-primary {
             width: 100%;
             padding: 10px;
             background-color: #007bff;
@@ -51,9 +52,52 @@
             color: white;
             font-size: 16px;
             cursor: pointer;
+            margin-bottom: 15px;
         }
-        button:hover {
+        .btn-primary:hover {
             background-color: #0056b3;
+        }
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 20px 0;
+            color: #888;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #ddd;
+        }
+        .divider:not(:empty)::before { margin-right: .25em; }
+        .divider:not(:empty)::after { margin-left: .25em; }
+        
+        /* Social Buttons Styling */
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            background-color: white;
+            transition: background-color 0.2s;
+        }
+        .btn-google { color: #db4437; }
+        .btn-google:hover { background-color: #fdf2f0; }
+        .btn-facebook { color: #1877f2; }
+        .btn-facebook:hover { background-color: #f0f5ff; }
+        .btn-phone { color: #25d366; }
+        .btn-phone:hover { background-color: #f0fdf4; }
+        
+        .social-btn i {
+            margin-right: 10px;
+            font-size: 18px;
         }
         .error-msg {
             color: red;
@@ -61,12 +105,17 @@
             margin-top: 10px;
             text-align: center;
         }
+        /* ReCaptcha Container Hidden by default until Phone Login */
+        #recaptcha-container {
+            margin: 10px 0;
+        }
     </style>
 </head>
 <body>
 
 <div class="login-container">
     <h2>Digital 24 Login</h2>
+    
     <form id="loginForm">
         <div class="input-group">
             <label for="userId">User ID</label>
@@ -76,16 +125,38 @@
             <label for="password">Password</label>
             <input type="password" id="password" required placeholder="Enter your Password">
         </div>
-        <button type="submit">Login</button>
-        <div id="error" class="error-msg"></div>
+        <button type="submit" class="btn-primary">Login</button>
     </form>
+
+    <div class="divider">OR</div>
+
+    <button class="social-btn btn-google" id="googleLogin">
+        <i class="fab fa-google"></i> Continue with Google (Gmail)
+    </button>
+    <button class="social-btn btn-facebook" id="facebookLogin">
+        <i class="fab fa-facebook-f"></i> Continue with Facebook
+    </button>
+    <button class="social-btn btn-phone" id="phoneLogin">
+        <i class="fas fa-phone-alt"></i> Continue with Phone Number
+    </button>
+
+    <div id="recaptcha-container"></div>
+    <div id="error" class="error-msg"></div>
 </div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+  import { 
+    getAuth, 
+    signInWithEmailAndPassword, 
+    GoogleAuthProvider, 
+    FacebookAuthProvider, 
+    signInWithPopup,
+    RecaptchaVerifier,
+    signInWithPhoneNumber
+  } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-  // আপনার ফায়ারবেস কনফিগারেশন অবজেক্ট
+  // আপনার ফায়ারবেস কনফিগারেশন অবজেক্ট (আপনার কনসোল থেকে প্রাপ্ত তথ্য এখানে বসান)
   const firebaseConfig = {
     apiKey: "YOUR_API_KEY",
     authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
@@ -98,30 +169,85 @@
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
+  
+  const errorDiv = document.getElementById('error');
 
-  // Login Form Handling
+  // ১. সাধারণ ইউজার আইডি/পাসওয়ার্ড লগইন
   document.getElementById('loginForm').addEventListener('submit', (e) => {
       e.preventDefault();
-      
       const userId = document.getElementById('userId').value;
       const password = document.getElementById('password').value;
-      const errorDiv = document.getElementById('error');
-      errorDiv.innerText = ""; // ক্লিয়ার এরর
+      errorDiv.innerText = "";
 
-      // এখানে আপনি যদি ইমেইল ফরম্যাট ছাড়া শুধু User ID দিয়ে লগইন করাতে চান, 
-      // তবে ফায়ারবেস অথেন্টিকেশনের নিয়ম অনুযায়ী এটিকে ইমেইল ফরম্যাটে কনভার্ট করে নিতে পারেন।
       const email = userId.includes('@') ? userId : `${userId}@digital24.com`;
 
       signInWithEmailAndPassword(auth, email, password)
           .then((userCredential) => {
-              // সফল লগইন
               alert("Login successful!");
-              window.location.href = "dashboard.html"; // সফল হলে ড্যাশবোর্ডে নিয়ে যাবে
+              window.location.href = "dashboard.html";
           })
           .catch((error) => {
-              // ব্যর্থ লগইন
               errorDiv.innerText = "Invalid User ID or Password.";
-              console.error(error.message);
+          });
+  });
+
+  // ২. গুগল (Gmail) সরাসরি লগইন
+  document.getElementById('googleLogin').addEventListener('click', () => {
+      const provider = new GoogleAuthProvider();
+      errorDiv.innerText = "";
+      
+      signInWithPopup(auth, provider)
+          .then((result) => {
+              alert("Google Login Successful! Connected as: " + result.user.email);
+              window.location.href = "dashboard.html";
+          })
+          .catch((error) => {
+              errorDiv.innerText = "Google Sign-In Failed: " + error.message;
+          });
+  });
+
+  // ৩. ফেসবুক লগইন
+  document.getElementById('facebookLogin').addEventListener('click', () => {
+      const provider = new FacebookAuthProvider();
+      errorDiv.innerText = "";
+      
+      signInWithPopup(auth, provider)
+          .then((result) => {
+              alert("Facebook Login Successful!");
+              window.location.href = "dashboard.html";
+          })
+          .catch((error) => {
+              errorDiv.innerText = "Facebook Sign-In Failed: " + error.message;
+          });
+  });
+
+  // ৪. ফোন নাম্বার লগইন (OTP)
+  document.getElementById('phoneLogin').addEventListener('click', () => {
+      errorDiv.innerText = "";
+      const phoneNumber = prompt("Enter your phone number with country code (e.g., +91XXXXXXXXXX):");
+      
+      if (!phoneNumber) return;
+
+      // Recaptcha ভেরিফিকেশন সেটআপ
+      window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+          'size': 'invisible'
+      });
+
+      const appVerifier = window.recaptchaVerifier;
+
+      signInWithPhoneNumber(auth, phoneNumber, appVerifier)
+          .then((confirmationResult) => {
+              const code = prompt("Enter the 6-digit OTP sent to your phone:");
+              if(code) {
+                  confirmationResult.confirm(code).then((result) => {
+                      alert("Phone Login Successful!");
+                      window.location.href = "dashboard.html";
+                  }).catch((error) => {
+                      errorDiv.innerText = "Incorrect OTP Code.";
+                  });
+              }
+          }).catch((error) => {
+              errorDiv.innerText = "SMS Error: " + error.message;
           });
   });
 </script>
