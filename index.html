@@ -105,7 +105,6 @@
             margin-top: 10px;
             text-align: center;
         }
-        /* ReCaptcha Container Hidden by default until Phone Login */
         #recaptcha-container {
             margin: 10px 0;
         }
@@ -156,14 +155,15 @@
     signInWithPhoneNumber
   } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-  // আপনার ফায়ারবেস কনফিগারেশন অবজেক্ট (আপনার কনসোল থেকে প্রাপ্ত তথ্য এখানে বসান)
+  // আপনার দেওয়া আসল ফায়ারবেস কনফিগারেশন অবজেক্ট
   const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyAKU8ratqUlIQfylrP3AIGGL8uZ_fkWxgw",
+    authDomain: "bill-82697.firebaseapp.com",
+    projectId: "bill-82697",
+    storageBucket: "bill-82697.firebasestorage.app",
+    messagingSenderId: "345025577698",
+    appId: "1:345025577698:web:bad8e6c96d3cb165aa94bb",
+    measurementId: "G-NCJJS7WG03"
   };
 
   // Initialize Firebase
@@ -228,7 +228,6 @@
       
       if (!phoneNumber) return;
 
-      // Recaptcha ভেরিফিকেশন সেটআপ
       window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
           'size': 'invisible'
       });
