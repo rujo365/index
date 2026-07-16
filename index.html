@@ -1,255 +1,237 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digital 24 - Advanced Login</title>
+    <title>সোনালী ডিজিটাল - বিলিং ড্যাশবোর্ড</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-        }
-        .login-container {
-            background: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 400px;
-        }
-        h2 {
-            margin-bottom: 20px;
-            color: #333;
-            text-align: center;
-        }
-        .input-group {
-            margin-bottom: 15px;
-        }
-        .input-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: #666;
-        }
-        .input-group input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        .btn-primary {
-            width: 100%;
-            padding: 10px;
-            background-color: #007bff;
-            border: none;
-            border-radius: 4px;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            margin-bottom: 15px;
-        }
-        .btn-primary:hover {
-            background-color: #0056b3;
-        }
-        .divider {
-            display: flex;
-            align-items: center;
-            text-align: center;
-            margin: 20px 0;
-            color: #888;
-        }
-        .divider::before, .divider::after {
-            content: '';
-            flex: 1;
-            border-bottom: 1px solid #ddd;
-        }
-        .divider:not(:empty)::before { margin-right: .25em; }
-        .divider:not(:empty)::after { margin-left: .25em; }
-        
-        /* Social Buttons Styling */
-        .social-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 15px;
-            font-weight: bold;
-            cursor: pointer;
-            background-color: white;
-            transition: background-color 0.2s;
-        }
-        .btn-google { color: #db4437; }
-        .btn-google:hover { background-color: #fdf2f0; }
-        .btn-facebook { color: #1877f2; }
-        .btn-facebook:hover { background-color: #f0f5ff; }
-        .btn-phone { color: #25d366; }
-        .btn-phone:hover { background-color: #f0fdf4; }
-        
-        .social-btn i {
-            margin-right: 10px;
-            font-size: 18px;
-        }
-        .error-msg {
-            color: red;
-            font-size: 14px;
-            margin-top: 10px;
-            text-align: center;
-        }
-        #recaptcha-container {
-            margin: 10px 0;
-        }
-    </style>
-</head>
-<body>
-
-<div class="login-container">
-    <h2>Digital 24 Login</h2>
     
-    <form id="loginForm">
-        <div class="input-group">
-            <label for="userId">User ID</label>
-            <input type="text" id="userId" required placeholder="Enter your User ID">
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+</head>
+<body class="bg-gray-100 font-sans min-h-screen flex flex-col">
+
+    <div id="login-container" class="flex-grow flex items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-gray-100">
+            <div class="text-center mb-8">
+                <div class="inline-flex p-3 bg-blue-50 rounded-full text-blue-600 text-3xl mb-3">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-800">সোনালী ডিজিটাল</h1>
+                <p class="text-gray-500 text-sm mt-1">বিলিং সিস্টেমে প্রবেশ করতে লগইন করুন</p>
+            </div>
+
+            <button id="google-login-btn" class="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-50 text-gray-700 font-semibold py-3 px-4 border border-gray-300 rounded-lg shadow-sm transition duration-150 mb-6">
+                <svg class="w-5 h-5" viewBox="0 0 24 24">
+                    <path fill="#EA4335" d="M12 5.04c1.66 0 3.2.57 4.38 1.69l3.27-3.27C17.67 1.54 14.98 1 12 1 7.35 1 3.37 3.67 1.39 7.56l3.89 3.02c.91-2.73 3.47-4.54 6.72-4.54z"/>
+                    <path fill="#4285F4" d="M23.49 12.27c0-.81-.07-1.59-.2-2.36H12v4.47h6.44c-.28 1.47-1.11 2.71-2.36 3.55l3.66 2.84c2.14-1.97 3.38-4.87 3.38-8.5z"/>
+                    <path fill="#FBBC05" d="M5.28 14.58c-.24-.71-.38-1.47-.38-2.26s.14-1.55.38-2.26L1.39 7.04C.5 8.81 0 10.8 0 12.91s.5 4.1 1.39 5.87l3.89-3.02z"/>
+                    <path fill="#34A853" d="M12 23c3.24 0 5.97-1.08 7.96-2.92l-3.66-2.84c-1.01.68-2.31 1.08-3.81 1.08-3.25 0-5.81-1.81-6.72-4.54L1.88 16.8C3.86 20.33 7.35 23 12 23z"/>
+                </svg>
+                Google দিয়ে লগইন করুন
+            </button>
+
+            <div class="relative flex py-3 items-center mb-6">
+                <div class="flex-grow border-t border-gray-200"></div>
+                <span class="flex-shrink mx-4 text-gray-400 text-xs uppercase">অথবা ওটিপি (OTP) লগইন</span>
+                <div class="flex-grow border-t border-gray-200"></div>
+            </div>
+
+            <div id="phone-login-form" class="space-y-4">
+                <div id="phone-input-section">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">মোবাইল নাম্বার</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 font-semibold">+91</span>
+                        <input type="tel" id="phone-number" placeholder="9876543210" class="w-full pl-12 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-800">
+                    </div>
+                    <button id="send-otp-btn" class="w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-4 rounded-lg shadow transition duration-150">
+                        OTP পাঠান
+                    </button>
+                </div>
+
+                <div id="otp-verify-section" class="hidden space-y-3">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">ওটিপি কোড (OTP) লিখুন</label>
+                    <input type="text" id="verification-code" placeholder="6-সংখ্যার কোড" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-center tracking-widest text-lg font-bold">
+                    <button id="verify-otp-btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 px-4 rounded-lg shadow transition duration-150">
+                        ভেরিফাই করুন
+                    </button>
+                </div>
+            </div>
+
+            <div id="recaptcha-container" class="mt-4 flex justify-center"></div>
         </div>
-        <div class="input-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" required placeholder="Enter your Password">
-        </div>
-        <button type="submit" class="btn-primary">Login</button>
-    </form>
+    </div>
 
-    <div class="divider">OR</div>
+    <div id="dashboard-container" class="hidden flex-grow flex flex-col">
+        <nav class="bg-white shadow-md px-6 py-4 flex justify-between items-center border-b border-gray-200">
+            <div class="flex items-center gap-3">
+                <span class="bg-blue-600 text-white p-2 rounded-lg text-xl"><i class="fa-solid fa-file-invoice-dollar"></i></span>
+                <span class="text-xl font-bold text-gray-800">সোনালী ডিজিটাল বিলিং</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="text-right hidden sm:block">
+                    <p id="user-display-name" class="font-semibold text-gray-800">ব্যবহারকারী</p>
+                    <p id="user-display-info" class="text-xs text-gray-500">লগইন আইডি</p>
+                </div>
+                <button id="logout-btn" class="bg-red-50 hover:bg-red-100 text-red-600 font-semibold py-2 px-4 rounded-lg transition duration-150 flex items-center gap-2 border border-red-200">
+                    <i class="fa-solid fa-right-from-bracket"></i> লগআউট
+                </button>
+            </div>
+        </nav>
 
-    <button class="social-btn btn-google" id="googleLogin">
-        <i class="fab fa-google"></i> Continue with Google (Gmail)
-    </button>
-    <button class="social-btn btn-facebook" id="facebookLogin">
-        <i class="fab fa-facebook-f"></i> Continue with Facebook
-    </button>
-    <button class="social-btn btn-phone" id="phoneLogin">
-        <i class="fas fa-phone-alt"></i> Continue with Phone Number
-    </button>
+        <main class="flex-grow p-6 max-w-7xl w-full mx-auto">
+            <div class="bg-white rounded-xl shadow p-6 border border-gray-100">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">স্বাগতম, আপনার ড্যাশবোর্ড প্রস্তুত!</h2>
+                <p class="text-gray-600">এখানে আপনি আপনার বিল তৈরি, হিসাব সংরক্ষণ এবং কাস্টমার ম্যানেজমেন্টের কাজগুলো করতে পারবেন।</p>
+                
+                <div class="mt-8 border-t border-gray-100 pt-6">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-3">সাম্প্রতিক বিলসমূহ</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-gray-50 text-gray-500 text-sm uppercase">
+                                    <th class="p-3 border-b">বিল আইডি</th>
+                                    <th class="p-3 border-b">কাস্টমার</th>
+                                    <th class="p-3 border-b">তারিখ</th>
+                                    <th class="p-3 border-b">পরিমাণ</th>
+                                    <th class="p-3 border-b">অবস্থা</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-gray-600 text-sm">
+                                <tr>
+                                    <td class="p-3 border-b font-mono">#SD-2026-001</td>
+                                    <td class="p-3 border-b">রাজেশ মজুমদার</td>
+                                    <td class="p-3 border-b">১৬/০৭/২০২৬</td>
+                                    <td class="p-3 border-b font-semibold">₹১,৫০০</td>
+                                    <td class="p-3 border-b"><span class="bg-green-100 text-green-800 px-2.5 py-1 rounded-full text-xs font-semibold">Paid</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
 
-    <div id="recaptcha-container"></div>
-    <div id="error" class="error-msg"></div>
-</div>
+    <script>
+        // আপনার দেওয়া Firebase কনফিগারেশন
+        const firebaseConfig = {
+            apiKey: "AIzaSyB8wfp9VkvpN2Mu2gHPOKVeZdvhCGK-3Bg",
+            authDomain: "my-bill-a682e.firebaseapp.com",
+            projectId: "my-bill-a682e",
+            storageBucket: "my-bill-a682e.firebasestorage.app",
+            messagingSenderId: "788198723884",
+            appId: "1:788198723884:web:fa054673d72c2e0be2dc89",
+            measurementId: "G-VVT40JQN99"
+        };
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { 
-    getAuth, 
-    signInWithEmailAndPassword, 
-    GoogleAuthProvider, 
-    FacebookAuthProvider, 
-    signInWithPopup,
-    RecaptchaVerifier,
-    signInWithPhoneNumber
-  } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        // ফায়ারবেস ইনিশিয়ালাইজেশন
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
 
-  // আপনার দেওয়া আসল ফায়ারবেস কনফিগারেশন অবজেক্ট
-  const firebaseConfig = {
-    apiKey: "AIzaSyAKU8ratqUlIQfylrP3AIGGL8uZ_fkWxgw",
-    authDomain: "bill-82697.firebaseapp.com",
-    projectId: "bill-82697",
-    storageBucket: "bill-82697.firebasestorage.app",
-    messagingSenderId: "345025577698",
-    appId: "1:345025577698:web:bad8e6c96d3cb165aa94bb",
-    measurementId: "G-NCJJS7WG03"
-  };
+        // রিক্যাপচা ইনিশিয়ালাইজেশন (মোবাইল ওটিপির জন্য প্রয়োজন)
+        window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+            'size': 'invisible',
+            'callback': (response) => {
+                // রিক্যাপচা সলভড
+            }
+        });
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  
-  const errorDiv = document.getElementById('error');
+        let confirmationResult;
 
-  // ১. সাধারণ ইউজার আইডি/পাসওয়ার্ড লগইন
-  document.getElementById('loginForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const userId = document.getElementById('userId').value;
-      const password = document.getElementById('password').value;
-      errorDiv.innerText = "";
+        // UI কন্ট্রোল এলিমেন্টসমূহ
+        const loginContainer = document.getElementById('login-container');
+        const dashboardContainer = document.getElementById('dashboard-container');
+        const userDisplayName = document.getElementById('user-display-name');
+        const userDisplayInfo = document.getElementById('user-display-info');
 
-      const email = userId.includes('@') ? userId : `${userId}@digital24.com`;
+        // লগইন স্ট্যাটাস চেক করা
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // ইউজার লগইন থাকলে ড্যাশবোর্ড দেখাও
+                loginContainer.classList.add('hidden');
+                dashboardContainer.classList.remove('hidden');
+                
+                // ইউজারের তথ্য সেট করা
+                userDisplayName.innerText = user.displayName || 'সম্মানিত ইউজার';
+                userDisplayInfo.innerText = user.email || user.phoneNumber || 'লগইন আইডি';
+            } else {
+                // লগআউট থাকলে লগইন স্ক্রিন দেখাও
+                loginContainer.classList.remove('hidden');
+                dashboardContainer.classList.add('hidden');
+            }
+        });
 
-      signInWithEmailAndPassword(auth, email, password)
-          .then((userCredential) => {
-              alert("Login successful!");
-              window.location.href = "dashboard.html";
-          })
-          .catch((error) => {
-              errorDiv.innerText = "Invalid User ID or Password.";
-          });
-  });
+        // ১. Google (Gmail) লগইন ফাংশন
+        document.getElementById('google-login-btn').addEventListener('click', () => {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider)
+                .then((result) => {
+                    console.log("জিমেইল লগইন সফল:", result.user);
+                })
+                .catch((error) => {
+                    alert("জিমেইল লগইন ব্যর্থ হয়েছে: " + error.message);
+                });
+        });
 
-  // ২. গুগল (Gmail) সরাসরি লগইন
-  document.getElementById('googleLogin').addEventListener('click', () => {
-      const provider = new GoogleAuthProvider();
-      errorDiv.innerText = "";
-      
-      signInWithPopup(auth, provider)
-          .then((result) => {
-              alert("Google Login Successful! Connected as: " + result.user.email);
-              window.location.href = "dashboard.html";
-          })
-          .catch((error) => {
-              errorDiv.innerText = "Google Sign-In Failed: " + error.message;
-          });
-  });
+        // ২. মোবাইল নাম্বারে ওটিপি পাঠানো
+        document.getElementById('send-otp-btn').addEventListener('click', () => {
+            const rawPhone = document.getElementById('phone-number').value.trim();
+            if (!rawPhone) {
+                alert("অনুগ্রহ করে একটি সচল মোবাইল নাম্বার দিন।");
+                return;
+            }
+            // কান্ট্রি কোড সহ মোবাইল নাম্বার সাজানো (+91 ভারতের জন্য)
+            const phoneNumber = "+91" + rawPhone; 
+            const appVerifier = window.recaptchaVerifier;
 
-  // ৩. ফেসবুক লগইন
-  document.getElementById('facebookLogin').addEventListener('click', () => {
-      const provider = new FacebookAuthProvider();
-      errorDiv.innerText = "";
-      
-      signInWithPopup(auth, provider)
-          .then((result) => {
-              alert("Facebook Login Successful!");
-              window.location.href = "dashboard.html";
-          })
-          .catch((error) => {
-              errorDiv.innerText = "Facebook Sign-In Failed: " + error.message;
-          });
-  });
+            auth.signInWithPhoneNumber(phoneNumber, appVerifier)
+                .then((result) => {
+                    confirmationResult = result;
+                    document.getElementById('phone-input-section').classList.add('hidden');
+                    document.getElementById('otp-verify-section').classList.remove('hidden');
+                    alert("আপনার নাম্বারে ওটিপি পাঠানো হয়েছে।");
+                })
+                .catch((error) => {
+                    alert("ওটিপি পাঠাতে সমস্যা হয়েছে: " + error.message);
+                    // রিক্যাপচা রিসেট করা
+                    if (window.recaptchaVerifier) {
+                        window.recaptchaVerifier.render().then(function(widgetId) {
+                            grecaptcha.reset(widgetId);
+                        });
+                    }
+                });
+        });
 
-  // ৪. ফোন নাম্বার লগইন (OTP)
-  document.getElementById('phoneLogin').addEventListener('click', () => {
-      errorDiv.innerText = "";
-      const phoneNumber = prompt("Enter your phone number with country code (e.g., +91XXXXXXXXXX):");
-      
-      if (!phoneNumber) return;
+        // ৩. ওটিপি ভেরিফিকেশন কোড চেক করা
+        document.getElementById('verify-otp-btn').addEventListener('click', () => {
+            const code = document.getElementById('verification-code').value.trim();
+            if (!code) {
+                alert("অনুগ্রহ করে ওটিপি কোডটি লিখুন।");
+                return;
+            }
 
-      window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-          'size': 'invisible'
-      });
+            confirmationResult.confirm(code)
+                .then((result) => {
+                    console.log("মোবাইল লগইন সফল:", result.user);
+                })
+                .catch((error) => {
+                    alert("ভুল ওটিপি কোড। দয়া করে আবার চেষ্টা করুন।");
+                });
+        });
 
-      const appVerifier = window.recaptchaVerifier;
-
-      signInWithPhoneNumber(auth, phoneNumber, appVerifier)
-          .then((confirmationResult) => {
-              const code = prompt("Enter the 6-digit OTP sent to your phone:");
-              if(code) {
-                  confirmationResult.confirm(code).then((result) => {
-                      alert("Phone Login Successful!");
-                      window.location.href = "dashboard.html";
-                  }).catch((error) => {
-                      errorDiv.innerText = "Incorrect OTP Code.";
-                  });
-              }
-          }).catch((error) => {
-              errorDiv.innerText = "SMS Error: " + error.message;
-          });
-  });
-</script>
-
+        // ৪. লগআউট ফাংশন
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            auth.signOut().then(() => {
+                // সফল লগআউট
+            }).catch((error) => {
+                alert("লগআউট করতে সমস্যা হয়েছে।");
+            });
+        });
+    </script>
 </body>
 </html>
+
+
+      
